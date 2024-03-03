@@ -32,7 +32,6 @@ env_logger = "0.10"
 
 [profile.release]
 opt-level = 2
-strip = true
 
 
 [profile.dev.package."*"]
