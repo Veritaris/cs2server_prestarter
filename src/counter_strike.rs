@@ -28,6 +28,17 @@ pub fn get_available_maps(game_path: &String) -> Option<Vec<String>> {
     };
 }
 
+pub fn get_maps_dir(game_path: &String) -> String {
+    return String::from(
+        Path::new(game_path)
+            .join(MAPS_DIR_PATH)
+            .canonicalize()
+            .unwrap()
+            .to_str()
+            .unwrap(),
+    );
+}
+
 pub fn create_server_process(
     game_path: &String,
     args: Vec<String>,

@@ -3,7 +3,7 @@ use crate::{counter_strike, steam, utils};
 use egui::{Color32, CursorIcon, Style, Visuals};
 use linked_hash_map::LinkedHashMap;
 use std::collections::HashMap;
-use std::process::Child;
+use std::process::{Child, Command};
 use std::string::String;
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -222,6 +222,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                 });
             }
 
+
             ui.heading("CS2 Server Settings");
 
             ui.add_enabled_ui(self.ready, |ui| {
@@ -230,11 +231,18 @@ impl eframe::App for CS2ServerPrestarterApp {
                     ui.add(
                         egui::TextEdit::singleline(&mut self.game_path)
                             .desired_width(400.0)
-                            .text_color(Color32::BLACK)
                     ).labelled_by(name_label.id);
+
                     if ui.button("Open")
                         .on_hover_text("Open game directory")
-                        .clicked() {}
+                        .clicked() {
+                        println!("{}", &self.game_path);
+                        if cfg!(target_os = "windows") {
+                            let _ = Command::new("explorer")
+                                .args([&self.game_path])
+                                .spawn();
+                        };
+                    };
                 });
 
                 egui::Grid::new("")
@@ -243,23 +251,23 @@ impl eframe::App for CS2ServerPrestarterApp {
                         ui.label("insecure")
                             .on_hover_text("Disable VAC on your server. If enabled you have to add `-insecure` to your CS2 start params")
                             .on_hover_cursor(CursorIcon::Default);
-                        ui.checkbox(&mut self.insecure, "");
+                        ui.checkbox(&mut self.insecure, "").on_hover_cursor(CursorIcon::PointingHand);
                         ui.end_row();
 
                         ui.label("mp_autokick")
                             .on_hover_text("Kick for AFK or team dmg")
                             .on_hover_cursor(CursorIcon::Default);
-                        ui.checkbox(&mut self.mp_autokick, "");
+                        ui.checkbox(&mut self.mp_autokick, "").on_hover_cursor(CursorIcon::PointingHand);
                         ui.end_row();
 
                         ui.label("mp_buy_anywhere")
                             .on_hover_text("Can anyone buy anywhere on map.")
                             .on_hover_cursor(CursorIcon::Default);
                         ui.horizontal(|ui| {
-                            ui.radio_value(&mut self.mp_buy_anywhere, 0, "Only buy zone");
-                            ui.radio_value(&mut self.mp_buy_anywhere, 1, "All teams");
-                            ui.radio_value(&mut self.mp_buy_anywhere, 2, "T only");
-                            ui.radio_value(&mut self.mp_buy_anywhere, 3, "CT only");
+                            ui.radio_value(&mut self.mp_buy_anywhere, 0, "Only buy zone").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.mp_buy_anywhere, 1, "All teams").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.mp_buy_anywhere, 2, "T only").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.mp_buy_anywhere, 3, "CT only").on_hover_cursor(CursorIcon::PointingHand);
                         });
                         ui.end_row();
 
@@ -270,7 +278,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_buytime)
                                 .speed(0.1)
                                 .clamp_range(0..=self.mp_roundtime)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("mp_c4timer")
@@ -280,7 +288,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_c4timer)
                                 .speed(0.1)
                                 .clamp_range(0..=self.mp_roundtime)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("mp_freezetime")
@@ -290,13 +298,13 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_freezetime)
                                 .speed(0.1)
                                 .clamp_range(0..=self.mp_roundtime)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("mp_friendlyfire")
                             .on_hover_text("Enable friendly fire or not")
                             .on_hover_cursor(CursorIcon::Default);
-                        ui.checkbox(&mut self.mp_friendlyfire, "");
+                        ui.checkbox(&mut self.mp_friendlyfire, "").on_hover_cursor(CursorIcon::PointingHand);
                         ui.end_row();
 
                         ui.label("mp_maxrounds")
@@ -306,7 +314,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_maxrounds)
                                 .speed(0.1)
                                 .clamp_range(0..=4096)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("mp_randomspawn")
@@ -314,14 +322,17 @@ impl eframe::App for CS2ServerPrestarterApp {
                             .on_hover_cursor(CursorIcon::Default);
                         ui.horizontal(|ui| {
                             ui.radio_value(&mut self.mp_randomspawn, 0, "Disabled")
-                                .on_hover_text("no random spawns");
+                                .on_hover_text("no random spawns")
+                                .on_hover_cursor(CursorIcon::PointingHand);
                             ui.radio_value(&mut self.mp_randomspawn, 1, "Everyone")
-                                .on_hover_text("everyone spawns in random locations (like deathmatch)");
+                                .on_hover_text("everyone spawns in random locations (like deathmatch)")
+                                .on_hover_cursor(CursorIcon::PointingHand);
                             ui.radio_value(&mut self.mp_randomspawn, 2, "T only")
-                                .on_hover_text("only terrorists spawn at random locations, CTs spawn at their spawn");
-
+                                .on_hover_text("only terrorists spawn at random locations, CTs spawn at their spawn")
+                                .on_hover_cursor(CursorIcon::PointingHand);
                             ui.radio_value(&mut self.mp_randomspawn, 3, "CT only")
-                                .on_hover_text("only CTs spawn at random locations, terrorists spawn at their spawn");
+                                .on_hover_text("only CTs spawn at random locations, terrorists spawn at their spawn")
+                                .on_hover_cursor(CursorIcon::PointingHand);
                         });
                         ui.end_row();
 
@@ -332,7 +343,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_roundtime)
                                 .speed(0.1)
                                 .clamp_range(0..=3600)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("mp_warmuptime")
@@ -342,7 +353,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_warmuptime)
                                 .speed(0.1)
                                 .clamp_range(0..=3600)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
                         ui.label("mp_endwarmup_player_count")
                             .on_hover_text("Players to connect to skip warmup")
@@ -351,7 +362,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.mp_endwarmup_player_count)
                                 .speed(0.1)
                                 .clamp_range(0..=3600)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("sv_minupdaterate")
@@ -361,7 +372,7 @@ impl eframe::App for CS2ServerPrestarterApp {
                             egui::DragValue::new(&mut self.sv_minupdaterate)
                                 .speed(0.1)
                                 .clamp_range(0..=4096)
-                        );
+                        ).on_hover_cursor(CursorIcon::VerticalText);
                         ui.end_row();
 
                         ui.label("sv_password")
@@ -377,22 +388,29 @@ impl eframe::App for CS2ServerPrestarterApp {
                             .selected_text(format!("{:?}", self.map_name))
                             .show_ui(ui, |ui| {
                                 for one_map in &self.available_maps {
-                                    ui.selectable_value(&mut self.map_name, one_map.to_string(), one_map);
+                                    ui.selectable_value(&mut self.map_name, one_map.to_string(), one_map).on_hover_cursor(CursorIcon::PointingHand);
                                 }
                             });
                         if ui.button("Open")
                             .on_hover_text("Open maps directory")
-                            .clicked() {}
+                            .on_hover_cursor(CursorIcon::PointingHand)
+                            .clicked() {
+                            if cfg!(target_os = "windows") {
+                                let _ = Command::new("explorer")
+                                    .args([counter_strike::get_maps_dir(&self.game_path)])
+                                    .spawn();
+                            };
+                        };
                         ui.end_row();
 
                         ui.label("game_alias")
                             .on_hover_text("Game type")
                             .on_hover_cursor(CursorIcon::Default);
                         ui.horizontal(|ui| {
-                            ui.radio_value(&mut self.game_alias, String::from("competitive"), "Competitive");
-                            ui.radio_value(&mut self.game_alias, String::from("wingman"), "Wingman");
-                            ui.radio_value(&mut self.game_alias, String::from("casual"), "Casual");
-                            ui.radio_value(&mut self.game_alias, String::from("custom"), "Custom");
+                            ui.radio_value(&mut self.game_alias, String::from("competitive"), "Competitive").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.game_alias, String::from("wingman"), "Wingman").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.game_alias, String::from("casual"), "Casual").on_hover_cursor(CursorIcon::PointingHand);
+                            ui.radio_value(&mut self.game_alias, String::from("custom"), "Custom").on_hover_cursor(CursorIcon::PointingHand);
                         });
                         ui.end_row();
                     });
