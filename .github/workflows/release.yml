@@ -19,21 +19,17 @@ jobs:
       - name: Cloning
         uses: actions/checkout@v3
 
-      - name: Installing Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
-
       - name: Get the release version from the tag
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-      - name: Build
-        uses: actions-rs/cargo@v1
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v0
         with:
-          use-cross: true
           command: build
-          args: --verbose --release --target ${{ matrix.target }}
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
+          strip: true
 
       - name: Build archive
         shell: bash
