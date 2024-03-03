@@ -1,10 +1,10 @@
-use std::string::String;
-use std::collections::HashMap;
-use std::process::Child;
-use egui::{Color32, CursorIcon, Style, Visuals};
-use linked_hash_map::LinkedHashMap;
 use crate::counter_strike::{create_server_process, CS2APPID};
 use crate::{counter_strike, steam, utils};
+use egui::{Color32, CursorIcon, Style, Visuals};
+use linked_hash_map::LinkedHashMap;
+use std::collections::HashMap;
+use std::process::Child;
+use std::string::String;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
@@ -88,7 +88,6 @@ pub struct CS2ServerPrestarterApp {
     available_steam_apps: LinkedHashMap<u32, steamlocate::App>,
 }
 
-
 impl Default for CS2ServerPrestarterApp {
     fn default() -> Self {
         let mut game_path: String = String::new();
@@ -101,40 +100,31 @@ impl Default for CS2ServerPrestarterApp {
                 game_path = res;
                 (steam::ReadyState::Ready, "".to_string(), "".to_string())
             }
-            Err(err) => {
-                match err {
-                    steamlocate::Error::FailedLocate(_) | steamlocate::Error::InvalidSteamDir(_) => {
-                        (
-                            steam::ReadyState::NoSteam,
-                            "Unable to find SteamLibrary directory. Are you sure you have Steam installed?".to_string(),
-                            "Steam not found".to_string()
-                        )
-                    }
-                    steamlocate::Error::MissingExpectedApp { app_id } => {
-                        (
-                            steam::ReadyState::NoGame,
-                            format!("Unable to find app with id {app_id}. \nAre you sure it is installed?"),
-                            "Game not found".to_string()
-                        )
-                    }
-                    _ => {
-                        (
-                            steam::ReadyState::NoSteam,
-                            format!("Unknown error occurred: {err}"),
-                            "Unknown error".to_string()
-                        )
-                    }
-                }
-            }
+            Err(err) => match err {
+                steamlocate::Error::FailedLocate(_) | steamlocate::Error::InvalidSteamDir(_) => (
+                    steam::ReadyState::NoSteam,
+                    "Unable to find SteamLibrary directory. Are you sure you have Steam installed?"
+                        .to_string(),
+                    "Steam not found".to_string(),
+                ),
+                steamlocate::Error::MissingExpectedApp { app_id } => (
+                    steam::ReadyState::NoGame,
+                    format!("Unable to find app with id {app_id}. \nAre you sure it is installed?"),
+                    "Game not found".to_string(),
+                ),
+                _ => (
+                    steam::ReadyState::NoSteam,
+                    format!("Unknown error occurred: {err}"),
+                    "Unknown error".to_string(),
+                ),
+            },
         };
 
         match state {
             steam::ReadyState::Ready => {
                 available_maps = match counter_strike::get_available_maps(&game_path) {
-                    None => {
-                        Vec::new()
-                    }
-                    Some(res) => { res }
+                    None => Vec::new(),
+                    Some(res) => res,
                 };
                 ready = true;
             }
