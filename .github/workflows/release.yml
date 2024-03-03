@@ -26,12 +26,17 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build binary
-        uses: houseabsolute/actions-rust-cross@v0
+        uses: dtolnay/rust-toolchain@stable
         with:
-          command: build
-          target: ${{ matrix.target }}
-          args: "--locked --release"
-          strip: true
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: "true"
+
+      - name: Build binary
+        uses: dtolnay/rust-toolchain@stable
+        run: cargo build --release --target {{ $matrix.target }}
 
       - name: Build archive
         shell: bash
