@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
+    branches:
+      - master
 
 jobs:
   build:
@@ -12,8 +14,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest,]
-        target: [x86_64-pc-windows-gnu,]
+        os: [ windows-latest, ]
+        target: [ x86_64-pc-windows-gnu, ]
 
     steps:
       - name: Cloning
