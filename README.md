@@ -1,6 +1,6 @@
 # CS2 Server Prestarter
 
-[![Build Status](https://github.com/Veritaris/cs2server_prestarter/actions/workflows/release.yml/badge.svg)](https://github.com/emilk/eframe_template/actions?workflow=CI)
+[![Build Status](https://github.com/Veritaris/cs2server_prestarter/actions/workflows/release.yml/badge.svg)](https://github.com/Veritaris/cs2server_prestarter/actions?workflow=release)
 
 Tired of playing on public servers? Want to play only with your friends?  
 
