@@ -36,7 +36,7 @@ jobs:
 
       - name: Build binary
         uses: dtolnay/rust-toolchain@stable
-        run: cargo build --release --target {{ $matrix.target }}
+      - run: cargo build --release --target {{ $matrix.target }}
 
       - name: Build archive
         shell: bash
